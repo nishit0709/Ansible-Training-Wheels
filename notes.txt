@@ -1,0 +1,1 @@
+RedHat doesn't enable httpd server by default, need to activate it manually. Will do it using ansible itself

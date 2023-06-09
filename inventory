@@ -1,3 +1,4 @@
-13.233.2.228	
-13.232.162.181	
-13.232.111.159	
+[targets]
+13.233.2.228	ansible_user=ubuntu
+43.205.140.2	ansible_user=ec2-user
+65.2.171.82     ansible_user=admin
