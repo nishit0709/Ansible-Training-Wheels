@@ -1,0 +1,56 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:  
+
+  - name: Update System(Red Hat)
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "RedHat"
+
+  - name: Update System(Ubuntu)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Update System(Debian)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Debian"
+
+
+- hosts: web_servers
+  become: true
+  tasks:
+  - name: Install apache and php (Ubuntu)
+    apt: 
+      name: 
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+
+- hosts: db_servers
+  become: true
+  tasks:
+  - name: Install MariaDB (RedHat)
+    dnf:
+      name: mariadb 
+      state: latest 
+    when: ansible_distribution == "RedHat"
+
+
+- hosts: file_servers
+  become: true
+  tasks:
+  - name: Install Samba (Debian)
+    package:
+      name: samba 
+      state: latest 
+    when: ansible_distribution == "Debian"
+  
