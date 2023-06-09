@@ -1,4 +1,4 @@
 [targets]
-13.233.2.228	ansible_user=ubuntu
-43.205.140.2	ansible_user=ec2-user
-65.2.171.82     ansible_user=admin
+13.233.2.228	ansible_user=ubuntu     apache_package=apache2  php_package=libapache2-mod-php
+43.205.140.2	ansible_user=ec2-user   apache_package=httpd    php_package=php
+65.2.171.82     ansible_user=admin      apache_package=apache2  php_package=libapache2-mod-php

@@ -4,36 +4,10 @@
   become: true
   tasks:  
 
-  - name: update repository index for debian based
-    apt:
+  - name: install apache and php
+    package: 
+      name: 
+        - "{{ apache_package }}"
+        - "{{ php_package }}"
+      state: latest
       update_cache: yes
-    when: ansible_distribution in ["Ubuntu", "Debian"]
-
-  - name: install apache2 package for debian based
-    apt: 
-      name: apache2
-      state: latest
-    when: ansible_distribution in ["Ubuntu", "Debian"]
-
-  - name: add php support for apache for debian based
-    apt:
-      name: libapache2-mod-php
-      state: latest
-    when: ansible_distribution in ["Ubuntu", "Debian"]
-
-  - name: update repository index for red-hat based
-    dnf:
-      update_cache: yes
-    when: ansible_distribution in ["RedHat"]
-
-  - name: install apache2 package for red-hat based
-    dnf: 
-      name: httpd
-      state: latest
-    when: ansible_distribution in ["RedHat"]
-
-  - name: add php support for apache for red-hat based
-    dnf:
-      name: php
-      state: latest
-    when: ansible_distribution in ["RedHat"]
