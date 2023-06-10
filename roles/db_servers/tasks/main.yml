@@ -1,0 +1,6 @@
+- name: Install Samba (Debian)
+  tags: fs, samba, debian
+  ansible.builtin.package:
+    name: samba
+    state: latest
+  when: ansible_distribution == "Debian"

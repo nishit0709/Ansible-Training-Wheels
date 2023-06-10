@@ -1,0 +1,6 @@
+- name: Install MariaDB (RedHat)
+  tags: db, mariadb, redhat
+  ansible.builtin.dnf:
+    name: mariadb
+    state: latest
+  when: ansible_distribution == "RedHat"

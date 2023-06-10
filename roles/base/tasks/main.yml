@@ -1,0 +1,5 @@
+- name: Add SSH key for nishit
+  tags: always
+  ansible.posix.authorized_key:
+    user: nishit
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMvWLpFM6KEqu0iSlOCa2yQ/R4HRXKWS7pXOh+F3T4uP"

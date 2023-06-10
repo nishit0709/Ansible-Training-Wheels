@@ -1,0 +1,50 @@
+- name: Install apache and php (Ubuntu)
+  tags: apache2, ubuntu
+  ansible.builtin.apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install apache and php (RedHat)
+  tags: apache2, redhat
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - php
+    state: latest
+  when: ansible_distribution == "RedHat"
+
+- name: Copy HTML file for site
+  tags: apache2, ubuntu, redhat
+  ansible.builtin.copy:
+    src: default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: "644"
+
+- name: Start httpd (RedHat)
+  tags: apache, redhat
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true
+  when: ansible_distribution == "RedHat"
+
+- name: Change Email for admin (RedHat)
+  tags: apache, redhat
+  ansible.builtin.lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: "^ServerAdmin"
+    line: ServerAdmin someone@somewhere@gmail.com
+  when: ansible_distribution == "RedHat"
+  register: httpd
+
+- name: Restart httpd (RedHat)
+  tags: apache, redhat
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+  when: httpd.changed
