@@ -40,4 +40,4 @@
     regexp: "^ServerAdmin"
     line: ServerAdmin someone@somewhere@gmail.in
   when: ansible_distribution == "RedHat"
-  notify: restart_apache
+  notify: Restart_Apache
