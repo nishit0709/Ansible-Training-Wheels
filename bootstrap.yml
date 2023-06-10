@@ -1,0 +1,50 @@
+---
+- hosts: all
+  become: true
+  name: System Update
+  pre_tasks:
+    - name: Update System(Red Hat)
+      tags: always
+      ansible.builtin.dnf:
+        update_only: true
+        update_cache: true
+      when: ansible_distribution == "RedHat"
+
+    - name: Update System(Ubuntu)
+      tags: always
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Update System(Debian)
+      tags: always
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+      when: ansible_distribution == "Debian"
+
+- hosts: all
+  become: true
+  name: User Creation
+  tasks:
+    - name: Create user nishit
+      tags: always
+      ansible.builtin.user:
+        name: nishit
+        groups: root
+
+    - name: Add SSH key for nishit
+      tags: always
+      ansible.posix.authorized_key:
+        user: nishit
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMvWLpFM6KEqu0iSlOCa2yQ/R4HRXKWS7pXOh+F3T4uP"
+
+    - name: Add sudoers file for nishit
+      tags: always
+      ansible.builtin.copy:
+        src: sudoer_nishit
+        dest: /etc/sudoers.d/nishit
+        owner: root
+        group: root
+        mode: "440"

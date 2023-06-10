@@ -1,0 +1,7 @@
+[web_servers]
+3.109.183.141	    ansible_user=ubuntu
+3.109.216.199	    ansible_user=ec2-user     
+[db_servers]
+3.109.216.199	    ansible_user=ec2-user   
+[file_servers]
+43.205.203.38	    ansible_user=admin      
