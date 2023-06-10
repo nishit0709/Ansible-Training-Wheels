@@ -1,0 +1,112 @@
+---
+- hosts: all
+  become: true
+  name: Cache Update
+  pre_tasks:
+    - name: Update Repo Cache(Red Hat)
+      tags: always
+      ansible.builtin.dnf:
+        update_cache: true
+      changed_when: false
+      when: ansible_distribution == "RedHat"
+
+    - name: Update Repo Cache(Ubuntu)
+      tags: always
+      ansible.builtin.apt:
+        update_cache: true
+      changed_when: false
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Update Repo Cache(Debian)
+      tags: always
+      ansible.builtin.apt:
+        update_cache: true
+      changed_when: false
+      when: ansible_distribution == "Debian"
+
+- hosts: all
+  become: true
+  name: User Creation
+  tasks:
+    - name: Add SSH key for nishit
+      tags: always
+      ansible.posix.authorized_key:
+        user: nishit
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMvWLpFM6KEqu0iSlOCa2yQ/R4HRXKWS7pXOh+F3T4uP"
+
+- hosts: web_servers
+  name: Web Server Setup
+  become: true
+  tasks:
+    - name: Install apache and php (Ubuntu)
+      tags: apache2, ubuntu
+      ansible.builtin.apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Install apache and php (RedHat)
+      tags: apache2, redhat
+      ansible.builtin.dnf:
+        name:
+          - httpd
+          - php
+        state: latest
+      when: ansible_distribution == "RedHat"
+
+    - name: Copy HTML file for site
+      tags: apache2, ubuntu, redhat
+      ansible.builtin.copy:
+        src: default_site.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: "644"
+
+    - name: Start httpd (RedHat)
+      tags: apache, redhat
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
+      when: ansible_distribution == "RedHat"
+
+    - name: Change Email for admin (RedHat)
+      tags: apache, redhat
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^ServerAdmin"
+        line: ServerAdmin someone@somewhere@gmail.com
+      when: ansible_distribution == "RedHat"
+      register: httpd
+
+    - name: Restart httpd (RedHat)
+      tags: apache, redhat
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+      when: httpd.changed
+
+- hosts: db_servers
+  name: Database Server Setup
+  become: true
+  tags: db, mariadb, redhat
+  tasks:
+    - name: Install MariaDB (RedHat)
+      ansible.builtin.dnf:
+        name: mariadb
+        state: latest
+      when: ansible_distribution == "RedHat"
+
+- hosts: file_servers
+  name: File Server Setup
+  become: true
+  tags: fs, samba, debian
+  tasks:
+    - name: Install Samba (Debian)
+      ansible.builtin.package:
+        name: samba
+        state: latest
+      when: ansible_distribution == "Debian"
