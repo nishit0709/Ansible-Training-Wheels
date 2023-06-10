@@ -1,62 +1,69 @@
 ---
-
 - hosts: all
   become: true
-  pre_tasks:  
+  name: System Update
+  pre_tasks:
+    - name: Update System(Red Hat)
+      tags: always
+      ansible.builtin.dnf:
+        update_only: true
+        update_cache: true
+      when: ansible_distribution == "RedHat"
 
-  - name: Update System(Red Hat)
-    tags: always
-    dnf:
-      update_only: yes
-      update_cache: yes
-    when: ansible_distribution == "RedHat"
+    - name: Update System(Ubuntu)
+      tags: always
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+      when: ansible_distribution == "Ubuntu"
 
-  - name: Update System(Ubuntu)
-    tags: always
-    apt:
-      upgrade: dist
-      update_cache: yes
-    when: ansible_distribution == "Ubuntu"
-
-  - name: Update System(Debian)
-    tags: always
-    apt:
-      upgrade: dist
-      update_cache: yes
-    when: ansible_distribution == "Debian"
-
+    - name: Update System(Debian)
+      tags: always
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+      when: ansible_distribution == "Debian"
 
 - hosts: web_servers
+  name: Web Server Setup
   become: true
-  tags: apache2, ubuntu
   tasks:
-  - name: Install apache and php (Ubuntu)
-    apt: 
-      name: 
-        - apache2
-        - libapache2-mod-php
-      state: latest
-    when: ansible_distribution == "Ubuntu"
+    - name: Install apache and php (Ubuntu)
+      tags: apache2, ubuntu
+      ansible.builtin.apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
+      when: ansible_distribution == "Ubuntu"
 
+    - name: Copy HTML file for site
+      tags: apache2, ubuntu
+      ansible.builtin.copy:
+        src: default_site.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: "644"
 
 - hosts: db_servers
+  name: Database Server Setup
   become: true
   tags: db, mariadb, redhat
   tasks:
-  - name: Install MariaDB (RedHat)
-    dnf:
-      name: mariadb 
-      state: latest 
-    when: ansible_distribution == "RedHat"
-
+    - name: Install MariaDB (RedHat)
+      ansible.builtin.dnf:
+        name: mariadb
+        state: latest
+      when: ansible_distribution == "RedHat"
 
 - hosts: file_servers
+  name: File Server Setup
   become: true
   tags: fs, samba, debian
   tasks:
-  - name: Install Samba (Debian)
-    package:
-      name: samba 
-      state: latest 
-    when: ansible_distribution == "Debian"
-  
+    - name: Install Samba (Debian)
+      ansible.builtin.package:
+        name: samba
+        state: latest
+      when: ansible_distribution == "Debian"
