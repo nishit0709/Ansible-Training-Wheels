@@ -2,8 +2,8 @@
   tags: apache2, ubuntu
   ansible.builtin.apt:
     name:
-      - apache2
-      - libapache2-mod-php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
   when: ansible_distribution == "Ubuntu"
 
@@ -11,8 +11,8 @@
   tags: apache2, redhat
   ansible.builtin.dnf:
     name:
-      - httpd
-      - php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
   when: ansible_distribution == "RedHat"
 
@@ -28,7 +28,7 @@
 - name: Start httpd (RedHat)
   tags: apache, redhat
   ansible.builtin.service:
-    name: httpd
+    name: "{{ apache_service }}"
     state: started
     enabled: true
   when: ansible_distribution == "RedHat"
@@ -38,13 +38,6 @@
   ansible.builtin.lineinfile:
     path: /etc/httpd/conf/httpd.conf
     regexp: "^ServerAdmin"
-    line: ServerAdmin someone@somewhere@gmail.com
+    line: ServerAdmin someone@somewhere@gmail.in
   when: ansible_distribution == "RedHat"
-  register: httpd
-
-- name: Restart httpd (RedHat)
-  tags: apache, redhat
-  ansible.builtin.service:
-    name: httpd
-    state: restarted
-  when: httpd.changed
+  notify: restart_apache
